@@ -1,0 +1,31 @@
+{# Reusable bits shared by several templates #}
+
+{% macro status_badge(status) -%}
+    {% set colors = {
+        'Applied': 'secondary', 'Screening': 'info', 'Interview': 'primary',
+        'Offer': 'success', 'Rejected': 'danger', 'Withdrawn': 'dark'
+    } %}
+    <span class="badge text-bg-{{ colors.get(status, 'secondary') }}">{{ status }}</span>
+{%- endmacro %}
+
+{% macro salary_range(job) -%}
+    {% if job.salary_min is not none and job.salary_max is not none %}
+        {{ job.salary_min|money }} – {{ job.salary_max|money }}
+    {% elif job.salary_min is not none %}
+        from {{ job.salary_min|money }}
+    {% elif job.salary_max is not none %}
+        up to {{ job.salary_max|money }}
+    {% else %}
+        <span class="text-muted">—</span>
+    {% endif %}
+{%- endmacro %}
+
+{% macro skill_badges(skills, style='light') -%}
+    {% for skill in skills %}<span class="badge skill-badge skill-{{ style }}">{{ skill }}</span> {% endfor %}
+{%- endmacro %}
+
+{% macro delete_button(action, message, label='Delete', size='sm') -%}
+    <form method="post" action="{{ action }}" class="d-inline confirm-delete" data-message="{{ message }}">
+        <button type="submit" class="btn btn-outline-danger btn-{{ size }}">{{ label }}</button>
+    </form>
+{%- endmacro %}

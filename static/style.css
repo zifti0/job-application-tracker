@@ -1,0 +1,63 @@
+/* Job Tracker - custom styles on top of Bootstrap 5 */
+
+:root {
+    --brand: #1f4e79;
+    --brand-dark: #163a5a;
+    --page-bg: #f4f6f9;
+}
+
+body {
+    background: var(--page-bg);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main { flex: 1; }
+
+.app-navbar { background: var(--brand); }
+.app-navbar .nav-link.active { font-weight: 600; border-bottom: 2px solid #fff; }
+
+.btn-primary { background: var(--brand); border-color: var(--brand); }
+.btn-primary:hover, .btn-primary:focus { background: var(--brand-dark); border-color: var(--brand-dark); }
+.btn-outline-primary { color: var(--brand); border-color: var(--brand); }
+.btn-outline-primary:hover { background: var(--brand); border-color: var(--brand); }
+a { color: var(--brand); }
+
+.card { border: none; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08); }
+.form-card { max-width: 860px; }
+
+/* Dashboard stat cards */
+.stat-card { color: inherit; transition: transform 0.1s ease, box-shadow 0.1s ease; }
+.stat-card:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); }
+.stat-label { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.04em; color: #6c757d; }
+.stat-value { font-size: 2rem; font-weight: 700; color: var(--brand); }
+
+/* Status colors for the dashboard bars (match the badge colors) */
+.status-applied   { background-color: #6c757d; }
+.status-screening { background-color: #0dcaf0; }
+.status-interview { background-color: #0d6efd; }
+.status-offer     { background-color: #198754; }
+.status-rejected  { background-color: #dc3545; }
+.status-withdrawn { background-color: #212529; }
+
+/* Skill tags */
+.skill-badge { font-weight: 500; margin-bottom: 2px; }
+.skill-light   { background: #e7eef6; color: var(--brand); }
+.skill-have    { background: #d1e7dd; color: #0f5132; }
+.skill-missing { background: #f8d7da; color: #842029; }
+
+/* Job Match results */
+.match-card { border-left: 5px solid #adb5bd; }
+.match-high { border-left-color: #198754; }
+.match-mid  { border-left-color: #fd7e14; }
+.match-low  { border-left-color: #dc3545; }
+.match-percent { font-size: 1.75rem; font-weight: 700; line-height: 1; }
+.match-high .match-percent { color: #198754; }
+.match-mid  .match-percent { color: #fd7e14; }
+.match-low  .match-percent { color: #dc3545; }
+.match-high .match-bar { background-color: #198754; }
+.match-mid  .match-bar { background-color: #fd7e14; }
+.match-low  .match-bar { background-color: #dc3545; }
+
+.table th { font-size: 0.85rem; font-weight: 600; }

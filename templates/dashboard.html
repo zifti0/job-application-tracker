@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% from "_macros.html" import status_badge %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+    <h1 class="h3 mb-0">Dashboard</h1>
+    <div class="d-flex gap-2">
+        <a href="{{ url_for('application_new') }}" class="btn btn-primary">+ New application</a>
+        <a href="{{ url_for('job_match') }}" class="btn btn-outline-primary">Find matching jobs</a>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    {% for label, value, endpoint in [
+        ('Applications', stats.totals.applications, 'applications'),
+        ('Jobs saved', stats.totals.jobs, 'jobs'),
+        ('Companies', stats.totals.companies, 'companies'),
+        ('Contacts', stats.totals.contacts, 'contacts'),
+    ] %}
+    <div class="col-6 col-md-3">
+        <a href="{{ url_for(endpoint) }}" class="card stat-card h-100 text-decoration-none">
+            <div class="card-body">
+                <div class="stat-label">{{ label }}</div>
+                <div class="stat-value">{{ value }}</div>
+            </div>
+        </a>
+    </div>
+    {% endfor %}
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card h-100"><div class="card-body">
+            <div class="stat-label">Still in progress</div>
+            <div class="stat-value">{{ active }}</div>
+            <div class="text-muted small">Applied, Screening, or Interview</div>
+        </div></div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100"><div class="card-body">
+            <div class="stat-label">Response rate</div>
+            <div class="stat-value">{{ response_rate }}%</div>
+            <div class="text-muted small">Applications that got past "Applied"</div>
+        </div></div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100"><div class="card-body">
+            <div class="stat-label">Average salary range</div>
+            <div class="stat-value fs-4">
+                {% if stats.avg_salary_min is not none %}
+                    {{ stats.avg_salary_min|money }} – {{ stats.avg_salary_max|money }}
+                {% else %}—{% endif %}
+            </div>
+            <div class="text-muted small">Across all saved jobs</div>
+        </div></div>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-lg-6">
+        <div class="card h-100">
+            <div class="card-header bg-white fw-semibold">Applications by status</div>
+            <div class="card-body">
+                {% set total = stats.totals.applications or 1 %}
+                {% for status, count in stats.by_status.items() %}
+                <div class="mb-2">
+                    <div class="d-flex justify-content-between small">
+                        <a href="{{ url_for('applications', status=status) }}" class="text-decoration-none">{{ status_badge(status) }}</a>
+                        <span>{{ count }}</span>
+                    </div>
+                    <div class="progress" role="progressbar" aria-label="{{ status }}" style="height: 8px;">
+                        <div class="progress-bar status-{{ status|lower }}" style="width: {{ (count / total * 100)|round }}%"></div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="card mb-3">
+            <div class="card-header bg-white fw-semibold">Upcoming interviews</div>
+            <ul class="list-group list-group-flush">
+                {% for a in upcoming %}
+                <li class="list-group-item d-flex justify-content-between">
+                    <a href="{{ url_for('application_detail', application_id=a.application_id) }}">
+                        {{ a.job_title }} · {{ a.company_name }}
+                    </a>
+                    <span class="text-muted small">
+                        {{ a.interview_data.interview_date }}
+                        {% if a.interview_data.interview_type %}({{ a.interview_data.interview_type }}){% endif %}
+                    </span>
+                </li>
+                {% else %}
+                <li class="list-group-item text-muted">No interviews scheduled.</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="card">
+            <div class="card-header bg-white fw-semibold">Recent applications</div>
+            <ul class="list-group list-group-flush">
+                {% for a in recent %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <a href="{{ url_for('application_detail', application_id=a.application_id) }}">
+                        {{ a.job_title }} · {{ a.company_name }}
+                    </a>
+                    <span>{{ status_badge(a.status) }} <span class="text-muted small ms-1">{{ a.application_date }}</span></span>
+                </li>
+                {% else %}
+                <li class="list-group-item text-muted">No applications yet.</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}
