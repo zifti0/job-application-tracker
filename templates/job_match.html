@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% from "_macros.html" import skill_badges, salary_range %}
+{% block title %}Job Match{% endblock %}
+{% block content %}
+<h1 class="h3 mb-1">Job Match</h1>
+<p class="text-muted">Enter your skills and see which saved jobs fit you best.
+    Match % = how many of a job's required skills you have.</p>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-2 align-items-end">
+            <div class="col-md-10">
+                <label for="skills" class="form-label">Your skills (comma-separated)</label>
+                <input type="text" class="form-control form-control-lg" id="skills" name="skills"
+                       placeholder="Python, SQL, Flask" value="{{ skills_text }}" required>
+            </div>
+            <div class="col-md-2 d-grid">
+                <button type="submit" class="btn btn-primary btn-lg">Match</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% if results is not none %}
+    <p class="mb-3"><strong>Your skills:</strong> {{ skills|join(', ') }}</p>
+
+    {% if not results %}
+        <div class="alert alert-info">No saved jobs have required skills listed yet.
+            <a href="{{ url_for('jobs') }}">Add skills to your jobs</a> to use Job Match.</div>
+    {% endif %}
+
+    {% for r in results %}
+    {% set level = 'high' if r.percent >= 75 else ('mid' if r.percent >= 40 else 'low') %}
+    <div class="card match-card match-{{ level }} mb-3">
+        <div class="card-body">
+            <div class="d-flex flex-wrap justify-content-between align-items-start gap-2">
+                <div>
+                    <span class="text-muted me-1">{{ loop.index }}.</span>
+                    <a href="{{ url_for('job_detail', job_id=r.job.job_id) }}" class="fw-semibold fs-5">{{ r.job.job_title }}</a>
+                    <span class="text-muted">at {{ r.job.company_name }}</span>
+                    <div class="small text-muted">{{ r.job.job_type or '' }} · {{ salary_range(r.job) }}</div>
+                </div>
+                <div class="text-end">
+                    <div class="match-percent">{{ r.percent }}%</div>
+                    <div class="small text-muted">{{ r.matched|length }}/{{ r.total }} skills</div>
+                </div>
+            </div>
+            <div class="progress my-2" style="height: 8px;" role="progressbar" aria-label="match">
+                <div class="progress-bar match-bar" style="width: {{ r.percent }}%"></div>
+            </div>
+            {% if r.matched %}<div class="small mb-1"><strong>Have:</strong> {{ skill_badges(r.matched, 'have') }}</div>{% endif %}
+            {% if r.missing %}<div class="small"><strong>Missing:</strong> {{ skill_badges(r.missing, 'missing') }}</div>{% endif %}
+        </div>
+    </div>
+    {% endfor %}
+{% endif %}
+{% endblock %}
