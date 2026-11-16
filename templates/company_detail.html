@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% from "_macros.html" import delete_button, salary_range, skill_badges %}
+{% block title %}{{ company.company_name }}{% endblock %}
+{% block content %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('companies') }}">Companies</a></li>
+        <li class="breadcrumb-item active">{{ company.company_name }}</li>
+    </ol>
+</nav>
+
+<div class="d-flex flex-wrap justify-content-between align-items-start mb-3 gap-2">
+    <div>
+        <h1 class="h3 mb-1">{{ company.company_name }}</h1>
+        <div class="text-muted">
+            {{ company.industry or 'Industry not set' }}
+            {% set location = [company.city, company.state]|select|join(', ') %}
+            {% if location %} · {{ location }}{% endif %}
+        </div>
+        {% if company.website %}<a href="{{ company.website }}" target="_blank" rel="noopener">{{ company.website }}</a>{% endif %}
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{{ url_for('company_edit', company_id=company.company_id) }}" class="btn btn-outline-secondary">Edit</a>
+        {{ delete_button(url_for('company_delete', company_id=company.company_id),
+            'Delete ' ~ company.company_name ~ '? This also deletes its jobs, applications, and contacts.', size='md') }}
+    </div>
+</div>
+
+{% if company.notes %}
+<div class="card mb-4"><div class="card-body"><strong>Notes:</strong> {{ company.notes }}</div></div>
+{% endif %}
+
+<div class="d-flex justify-content-between align-items-center mb-2">
+    <h2 class="h5 mb-0">Jobs ({{ jobs|length }})</h2>
+    <a href="{{ url_for('job_new', company_id=company.company_id) }}" class="btn btn-sm btn-primary">+ Add job</a>
+</div>
+<div class="card mb-4">
+    <ul class="list-group list-group-flush">
+    {% for j in jobs %}
+        <li class="list-group-item">
+            <a href="{{ url_for('job_detail', job_id=j.job_id) }}" class="fw-semibold">{{ j.job_title }}</a>
+            <span class="text-muted small">· {{ j.job_type or 'Type not set' }} · {{ salary_range(j) }}</span>
+            <div class="mt-1">{{ skill_badges(j.requirements) }}</div>
+        </li>
+    {% else %}
+        <li class="list-group-item text-muted">No jobs saved for this company.</li>
+    {% endfor %}
+    </ul>
+</div>
+
+<div class="d-flex justify-content-between align-items-center mb-2">
+    <h2 class="h5 mb-0">Contacts ({{ contacts|length }})</h2>
+    <a href="{{ url_for('contact_new', company_id=company.company_id) }}" class="btn btn-sm btn-primary">+ Add contact</a>
+</div>
+<div class="card">
+    <ul class="list-group list-group-flush">
+    {% for k in contacts %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+                <span class="fw-semibold">{{ k.contact_name }}</span>
+                {% if k.title %}<span class="text-muted small">· {{ k.title }}</span>{% endif %}
+                <div class="small">
+                    {% if k.email %}<a href="mailto:{{ k.email }}">{{ k.email }}</a>{% endif %}
+                    {% if k.phone %} · {{ k.phone }}{% endif %}
+                </div>
+            </div>
+            <a href="{{ url_for('contact_edit', contact_id=k.contact_id) }}" class="btn btn-outline-secondary btn-sm">Edit</a>
+        </li>
+    {% else %}
+        <li class="list-group-item text-muted">No contacts at this company yet.</li>
+    {% endfor %}
+    </ul>
+</div>
+{% endblock %}

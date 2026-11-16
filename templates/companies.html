@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% from "_macros.html" import delete_button %}
+{% block title %}Companies{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 mb-0">Companies</h1>
+    <a href="{{ url_for('company_new') }}" class="btn btn-primary">+ Add company</a>
+</div>
+
+<div class="card">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Company</th>
+                    <th>Industry</th>
+                    <th>Location</th>
+                    <th class="text-center">Jobs</th>
+                    <th class="text-center">Contacts</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for c in companies %}
+                <tr>
+                    <td>
+                        <a href="{{ url_for('company_detail', company_id=c.company_id) }}" class="fw-semibold">{{ c.company_name }}</a>
+                        {% if c.website %}<div class="small"><a href="{{ c.website }}" target="_blank" rel="noopener" class="text-muted">{{ c.website }}</a></div>{% endif %}
+                    </td>
+                    <td>{{ c.industry or '—' }}</td>
+                    <td>{{ [c.city, c.state]|select|join(', ') or '—' }}</td>
+                    <td class="text-center">{{ c.job_count }}</td>
+                    <td class="text-center">{{ c.contact_count }}</td>
+                    <td class="text-end text-nowrap">
+                        <a href="{{ url_for('company_edit', company_id=c.company_id) }}" class="btn btn-outline-secondary btn-sm">Edit</a>
+                        {{ delete_button(url_for('company_delete', company_id=c.company_id),
+                            'Delete ' ~ c.company_name ~ '? This also deletes its jobs, applications, and contacts.') }}
+                    </td>
+                </tr>
+            {% else %}
+                <tr><td colspan="6" class="text-center text-muted py-4">No companies yet. Add your first one!</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
