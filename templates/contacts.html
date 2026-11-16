@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% from "_macros.html" import delete_button %}
+{% block title %}Contacts{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 mb-0">Contacts</h1>
+    <a href="{{ url_for('contact_new') }}" class="btn btn-primary">+ Add contact</a>
+</div>
+
+<div class="card">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Name</th>
+                    <th>Company</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Notes</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for k in contacts %}
+                <tr>
+                    <td>
+                        <span class="fw-semibold">{{ k.contact_name }}</span>
+                        {% if k.linkedin_url %}<a href="{{ k.linkedin_url }}" target="_blank" rel="noopener" class="small ms-1">LinkedIn</a>{% endif %}
+                        {% if k.title %}<div class="small text-muted">{{ k.title }}</div>{% endif %}
+                    </td>
+                    <td><a href="{{ url_for('company_detail', company_id=k.company_id) }}">{{ k.company_name }}</a></td>
+                    <td>{% if k.email %}<a href="mailto:{{ k.email }}">{{ k.email }}</a>{% else %}—{% endif %}</td>
+                    <td class="text-nowrap">{{ k.phone or '—' }}</td>
+                    <td class="small">{{ k.notes or '' }}</td>
+                    <td class="text-end text-nowrap">
+                        <a href="{{ url_for('contact_edit', contact_id=k.contact_id) }}" class="btn btn-outline-secondary btn-sm">Edit</a>
+                        {{ delete_button(url_for('contact_delete', contact_id=k.contact_id), 'Delete ' ~ k.contact_name ~ '?') }}
+                    </td>
+                </tr>
+            {% else %}
+                <tr><td colspan="6" class="text-center text-muted py-4">No contacts yet.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
