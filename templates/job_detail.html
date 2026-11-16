@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% from "_macros.html" import delete_button, salary_range, skill_badges, status_badge %}
+{% block title %}{{ job.job_title }}{% endblock %}
+{% block content %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('jobs') }}">Jobs</a></li>
+        <li class="breadcrumb-item active">{{ job.job_title }}</li>
+    </ol>
+</nav>
+
+<div class="d-flex flex-wrap justify-content-between align-items-start mb-3 gap-2">
+    <div>
+        <h1 class="h3 mb-1">{{ job.job_title }}</h1>
+        <a href="{{ url_for('company_detail', company_id=job.company_id) }}">{{ job.company_name }}</a>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{{ url_for('job_edit', job_id=job.job_id) }}" class="btn btn-outline-secondary">Edit</a>
+        {{ delete_button(url_for('job_delete', job_id=job.job_id),
+            'Delete this job? Its applications will be deleted too.', size='md') }}
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <dl class="row mb-0">
+            <dt class="col-sm-3">Job type</dt>      <dd class="col-sm-9">{{ job.job_type or '—' }}</dd>
+            <dt class="col-sm-3">Salary</dt>        <dd class="col-sm-9">{{ salary_range(job) }}</dd>
+            <dt class="col-sm-3">Date posted</dt>   <dd class="col-sm-9">{{ job.date_posted or '—' }}</dd>
+            <dt class="col-sm-3">Posting</dt>
+            <dd class="col-sm-9">
+                {% if job.job_url %}<a href="{{ job.job_url }}" target="_blank" rel="noopener">{{ job.job_url }}</a>{% else %}—{% endif %}
+            </dd>
+            <dt class="col-sm-3">Required skills</dt>
+            <dd class="col-sm-9">{{ skill_badges(job.requirements) if job.requirements else '—' }}</dd>
+        </dl>
+    </div>
+</div>
+
+<div class="d-flex justify-content-between align-items-center mb-2">
+    <h2 class="h5 mb-0">Applications ({{ applications|length }})</h2>
+    <a href="{{ url_for('application_new', job_id=job.job_id) }}" class="btn btn-sm btn-primary">+ Apply / log application</a>
+</div>
+<div class="card">
+    <ul class="list-group list-group-flush">
+    {% for a in applications %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            <a href="{{ url_for('application_detail', application_id=a.application_id) }}">Applied {{ a.application_date }}</a>
+            {{ status_badge(a.status) }}
+        </li>
+    {% else %}
+        <li class="list-group-item text-muted">You haven't applied to this job yet.</li>
+    {% endfor %}
+    </ul>
+</div>
+{% endblock %}

@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block title %}{{ mode }} Job{% endblock %}
+{% block content %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('jobs') }}">Jobs</a></li>
+        <li class="breadcrumb-item active">{{ mode }}</li>
+    </ol>
+</nav>
+<h1 class="h3 mb-3">{{ mode }} job</h1>
+
+{% if not companies %}
+<div class="alert alert-warning">
+    You need at least one company before adding a job.
+    <a href="{{ url_for('company_new') }}">Add a company</a>.
+</div>
+{% else %}
+<div class="card form-card">
+    <div class="card-body">
+        <form method="post">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="company_id" class="form-label">Company <span class="text-danger">*</span></label>
+                    <select class="form-select" id="company_id" name="company_id" required>
+                        <option value="">Choose a company…</option>
+                        {% for c in companies %}
+                        <option value="{{ c.company_id }}" {% if job.company_id|string == c.company_id|string %}selected{% endif %}>
+                            {{ c.company_name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="job_title" class="form-label">Job title <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="job_title" name="job_title"
+                           maxlength="100" required value="{{ job.job_title or '' }}">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label for="job_type" class="form-label">Job type</label>
+                    <select class="form-select" id="job_type" name="job_type">
+                        <option value="">—</option>
+                        {% for t in job_types %}
+                        <option value="{{ t }}" {% if job.job_type == t %}selected{% endif %}>{{ t }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="salary_min" class="form-label">Minimum salary ($)</label>
+                    <input type="number" class="form-control" id="salary_min" name="salary_min" min="0" step="1"
+                           value="{{ job.salary_min if job.salary_min is not none else '' }}">
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="salary_max" class="form-label">Maximum salary ($)</label>
+                    <input type="number" class="form-control" id="salary_max" name="salary_max" min="0" step="1"
+                           value="{{ job.salary_max if job.salary_max is not none else '' }}">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-8 mb-3">
+                    <label for="job_url" class="form-label">Job posting URL</label>
+                    <input type="url" class="form-control" id="job_url" name="job_url" maxlength="300"
+                           placeholder="https://..." value="{{ job.job_url or '' }}">
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="date_posted" class="form-label">Date posted</label>
+                    <input type="date" class="form-control" id="date_posted" name="date_posted"
+                           value="{{ job.date_posted or '' }}">
+                </div>
+            </div>
+            <div class="mb-3">
+                <label for="requirements" class="form-label">Required skills</label>
+                <input type="text" class="form-control" id="requirements" name="requirements"
+                       placeholder="Python, SQL, Flask" value="{{ (job.requirements or [])|join(', ') }}">
+                <div class="form-text">Separate skills with commas. These are stored as a JSON array and used by Job Match.</div>
+            </div>
+            <button type="submit" class="btn btn-primary">Save</button>
+            <a href="{{ url_for('job_detail', job_id=job.job_id) if job.job_id else url_for('jobs') }}"
+               class="btn btn-link">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

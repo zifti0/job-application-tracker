@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% from "_macros.html" import delete_button, salary_range, skill_badges %}
+{% block title %}Jobs{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 mb-0">Jobs</h1>
+    <a href="{{ url_for('job_new') }}" class="btn btn-primary">+ Add job</a>
+</div>
+
+<div class="card">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Job</th>
+                    <th>Type</th>
+                    <th>Salary</th>
+                    <th>Required skills</th>
+                    <th>Posted</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for j in jobs %}
+                <tr>
+                    <td>
+                        <a href="{{ url_for('job_detail', job_id=j.job_id) }}" class="fw-semibold">{{ j.job_title }}</a>
+                        <div class="small text-muted">{{ j.company_name }}</div>
+                    </td>
+                    <td>{{ j.job_type or '—' }}</td>
+                    <td class="text-nowrap">{{ salary_range(j) }}</td>
+                    <td>{{ skill_badges(j.requirements) }}</td>
+                    <td class="text-nowrap">{{ j.date_posted or '—' }}</td>
+                    <td class="text-end text-nowrap">
+                        <a href="{{ url_for('job_edit', job_id=j.job_id) }}" class="btn btn-outline-secondary btn-sm">Edit</a>
+                        {{ delete_button(url_for('job_delete', job_id=j.job_id),
+                            'Delete ' ~ j.job_title ~ ' at ' ~ j.company_name ~ '? Its applications will be deleted too.') }}
+                    </td>
+                </tr>
+            {% else %}
+                <tr><td colspan="6" class="text-center text-muted py-4">No jobs yet. Add a company first, then add jobs to it.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
