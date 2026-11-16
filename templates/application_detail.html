@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% from "_macros.html" import delete_button, status_badge %}
+{% block title %}Application · {{ application.job_title }}{% endblock %}
+{% block content %}
+{% set interview = application.interview_data %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('applications') }}">Applications</a></li>
+        <li class="breadcrumb-item active">{{ application.job_title }}</li>
+    </ol>
+</nav>
+
+<div class="d-flex flex-wrap justify-content-between align-items-start mb-3 gap-2">
+    <div>
+        <h1 class="h3 mb-1">{{ application.job_title }} {{ status_badge(application.status) }}</h1>
+        <a href="{{ url_for('company_detail', company_id=application.company_id) }}">{{ application.company_name }}</a>
+        · <a href="{{ url_for('job_detail', job_id=application.job_id) }}">view job</a>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{{ url_for('application_edit', application_id=application.application_id) }}" class="btn btn-outline-secondary">Edit</a>
+        {{ delete_button(url_for('application_delete', application_id=application.application_id),
+            'Delete this application?', size='md') }}
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header bg-white fw-semibold">Application</div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-6">Applied on</dt>     <dd class="col-6">{{ application.application_date }}</dd>
+                    <dt class="col-6">Status</dt>         <dd class="col-6">{{ application.status }}</dd>
+                    <dt class="col-6">Resume version</dt> <dd class="col-6">{{ application.resume_version or '—' }}</dd>
+                    <dt class="col-6">Cover letter</dt>   <dd class="col-6">{{ 'Sent' if application.cover_letter_sent else 'Not sent' }}</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header bg-white fw-semibold">Interview</div>
+            <div class="card-body">
+                {% if interview %}
+                <dl class="row mb-0">
+                    <dt class="col-5">Date</dt>        <dd class="col-7">{{ interview.interview_date or '—' }}</dd>
+                    <dt class="col-5">Type</dt>        <dd class="col-7">{{ interview.interview_type or '—' }}</dd>
+                    <dt class="col-5">Interviewer</dt> <dd class="col-7">{{ interview.interviewer or '—' }}</dd>
+                    <dt class="col-5">Notes</dt>       <dd class="col-7">{{ interview.notes or '—' }}</dd>
+                </dl>
+                {% else %}
+                <p class="text-muted mb-0">No interview logged yet.
+                    <a href="{{ url_for('application_edit', application_id=application.application_id) }}">Add details</a>.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
