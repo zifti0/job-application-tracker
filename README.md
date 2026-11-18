@@ -8,6 +8,7 @@ A full-stack web app for tracking job applications. You can keep companies, job 
 
 - **Dashboard:** totals, applications by status, response rate, average salary range, upcoming interviews and recent applications
 - **Full CRUD on all 4 tables:** companies, jobs, applications and contacts, with list views, detail views, add/edit forms and delete-with-confirmation
+- **Error handling:** if MySQL is down or a query fails, the change is rolled back and you see a friendly error page instead of a crash.
 - **Validation** on both sides. The browser checks required fields, URLs and emails, and the server checks lengths, URL and email format, salary min ≤ max, valid dates and valid ENUM values.
 - **JSON columns:**
   - `jobs.requirements` stores the required skills as a JSON array
@@ -27,6 +28,8 @@ companies 1 ──< contacts
 | `jobs` | job_id (PK), job_title, job_type ENUM, salary_min/max, requirements JSON | company_id → companies |
 | `applications` | application_id (PK), application_date, status ENUM, interview_data JSON | job_id → jobs |
 | `contacts` | contact_id (PK), contact_name, email, phone | company_id → companies |
+
+Every table also has a `created_at` timestamp (carried over from Assignment 2), and `schema.sql` creates the indexes from Assignment 3 (`idx_job_title`, `idx_salary`, `idx_company_type`, `idx_app_status`, `idx_company_industry`).
 
 All foreign keys use `ON DELETE CASCADE`. Deleting a company also removes its jobs, contacts and those jobs' applications, and the delete confirmation warns you about this.
 
@@ -98,7 +101,8 @@ job_tracker/
 │   ├── applications.html, application_form.html, application_detail.html
 │   ├── contacts.html, contact_form.html
 │   ├── job_match.html
-│   └── 404.html
+│   ├── 404.html
+│   └── db_error.html    # Shown if MySQL is unreachable
 ├── static/
 │   └── style.css
 ├── AI_USAGE.md          # How GenAI tools were used

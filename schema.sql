@@ -26,7 +26,8 @@ CREATE TABLE companies (
     website      VARCHAR(200),
     city         VARCHAR(50),
     state        VARCHAR(50),
-    notes        TEXT
+    notes        TEXT,
+    created_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- -------------------------------------------------------------
@@ -43,6 +44,7 @@ CREATE TABLE jobs (
     job_url      VARCHAR(300),
     date_posted  DATE,
     requirements JSON,
+    created_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_jobs_company
         FOREIGN KEY (company_id) REFERENCES companies(company_id)
         ON DELETE CASCADE
@@ -63,6 +65,7 @@ CREATE TABLE applications (
     resume_version    VARCHAR(50),
     cover_letter_sent BOOLEAN DEFAULT FALSE,
     interview_data    JSON,
+    created_at        TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_applications_job
         FOREIGN KEY (job_id) REFERENCES jobs(job_id)
         ON DELETE CASCADE
@@ -80,10 +83,21 @@ CREATE TABLE contacts (
     phone        VARCHAR(20),
     linkedin_url VARCHAR(200),
     notes        TEXT,
+    created_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_contacts_company
         FOREIGN KEY (company_id) REFERENCES companies(company_id)
         ON DELETE CASCADE
 );
+
+-- -------------------------------------------------------------
+-- Indexes (from Assignment 3) to speed up common lookups
+-- Foreign key columns are indexed automatically by MySQL.
+-- -------------------------------------------------------------
+CREATE INDEX idx_job_title        ON jobs(job_title);
+CREATE INDEX idx_salary           ON jobs(salary_min);
+CREATE INDEX idx_company_type     ON jobs(company_id, job_type);
+CREATE INDEX idx_app_status       ON applications(status);
+CREATE INDEX idx_company_industry ON companies(industry);
 
 -- =============================================================
 -- Sample data (fictional companies and people)
