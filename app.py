@@ -14,6 +14,7 @@ import os
 import re
 from datetime import date
 
+import mysql.connector
 from flask import Flask, abort, flash, redirect, render_template, request, url_for
 
 import database as db
@@ -519,6 +520,13 @@ def job_match():
 @app.errorhandler(404)
 def not_found(error):
     return render_template("404.html"), 404
+
+
+@app.errorhandler(mysql.connector.Error)
+def database_error(error):
+    """Show a friendly page (instead of a crash) if MySQL is down or a query fails."""
+    app.logger.error("Database error: %s", error)
+    return render_template("db_error.html", error=error), 500
 
 
 if __name__ == "__main__":

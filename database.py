@@ -60,6 +60,9 @@ def execute(sql, params=()):
         conn.commit()
         new_id = cursor.lastrowid
         cursor.close()
+    except mysql.connector.Error:
+        conn.rollback()  # undo the partial change, then let the app show an error page
+        raise
     finally:
         conn.close()
     return new_id
